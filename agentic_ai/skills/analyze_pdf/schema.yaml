@@ -1,0 +1,23 @@
+input:
+  type: object
+  required: [document_text]
+  properties:
+    document_text:
+      type: string
+    prior_document_ids:
+      type: array
+      items:
+        type: string
+    prior_documents:
+      type: array
+
+output:
+  type: object
+  required: [summary]
+  properties:
+    summary:
+      type: string
+    findings:
+      type: array
+    citations:
+      type: array

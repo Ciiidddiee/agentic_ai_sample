@@ -1,0 +1,9 @@
+default_store: knowledge_base
+
+stores:
+  knowledge_base:
+    type: local
+    path: data/knowledge_base
+    collection: documents
+    # Embeddings via Chroma DefaultEmbeddingFunction (ONNX MiniLM)
+    embedding_model: chroma-default

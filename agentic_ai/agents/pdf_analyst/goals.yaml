@@ -1,0 +1,14 @@
+name: pdf_analyst
+goal: >
+  Given an uploaded PDF, extract its content, find useful prior documents,
+  decide whether to use them as context, and produce an analysis.
+
+done_when:
+  - OCR (or equivalent text) is available for the upload
+  - A prior-context decision was made (use | skip | ask resolved)
+  - An analysis result was produced
+
+stop_when:
+  - User cancels
+  - Unrecoverable OCR failure without fallback text
+  - Decision is ask and no user response yet

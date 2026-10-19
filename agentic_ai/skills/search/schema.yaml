@@ -1,0 +1,27 @@
+input:
+  type: object
+  required: [query]
+  properties:
+    query:
+      type: string
+    store:
+      type: string
+      default: knowledge_base
+    top_k:
+      type: integer
+      default: 5
+
+output:
+  type: array
+  items:
+    type: object
+    required: [id, score]
+    properties:
+      id:
+        type: string
+      score:
+        type: number
+      snippet:
+        type: string
+      metadata:
+        type: object
