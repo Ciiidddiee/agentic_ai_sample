@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from agentic_ai.tools.ocr import run_ocr
+from agentic_ai.shared.tools.ocr import run_ocr
 
 SAMPLES = Path(__file__).resolve().parents[2] / "data" / "raw" / "samples"
 
@@ -12,3 +12,4 @@ def test_run_ocr_on_sample_invoice():
     assert "Acme" in result["text"]
     assert result["confidence"] > 0
     assert result["pages"]
+    assert result["kind"] == "pdf"

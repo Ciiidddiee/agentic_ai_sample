@@ -2,7 +2,7 @@ from pathlib import Path
 
 import yaml
 
-from agentic_ai.llm.config import LLMConfig, load_llm_config
+from agentic_ai.shared.llm.config import LLMConfig, load_llm_config
 
 
 def test_public_groq_model_id(tmp_path):

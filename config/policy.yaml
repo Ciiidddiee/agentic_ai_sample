@@ -3,10 +3,10 @@ allowed_tools:
   - search
   - ingest
 
-# Similarity below this → prefer ask over automatic use
+# Similarity below min_score*0.5 → ask (human: continue | ingest | drop | use)
+# Stronger scores → LLM chooses use | ask only (no automatic skip)
 prior_context:
   min_score: 0.75
-  on_low_confidence: ask  # use | skip | ask
 
 writes:
   # New documents may only enter the store via ingest

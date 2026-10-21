@@ -1,0 +1,17 @@
+input:
+  type: object
+  required: [document_path]
+  properties:
+    document_path:
+      type: string
+
+output:
+  type: object
+  required: [text, confidence]
+  properties:
+    text:
+      type: string
+    sheets:
+      type: array
+    confidence:
+      type: number

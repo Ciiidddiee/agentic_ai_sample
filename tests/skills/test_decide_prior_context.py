@@ -2,7 +2,10 @@
 
 from pathlib import Path
 
-from agentic_ai.skills.decide_prior_context.run import decide_prior_context
+from agentic_ai.agents.defect_analyzer.skills.decide_prior_context.run import (
+    ASK_OPTIONS,
+    decide_prior_context,
+)
 
 
 class FakeLLM:
@@ -15,10 +18,21 @@ class FakeLLM:
         return self.content
 
 
-def test_empty_hits_skip_without_llm():
+def test_empty_hits_ask_without_llm():
     result = decide_prior_context([])
-    assert result["decision"] == "skip"
+    assert result["decision"] == "ask"
     assert result["document_ids"] == []
+    assert result["options"] == list(ASK_OPTIONS)
+
+
+def test_very_low_score_ask_without_llm():
+    result = decide_prior_context(
+        [{"id": "doc_1", "score": 0.2, "snippet": "weak"}],
+        document_text="unrelated",
+        min_score=0.75,
+    )
+    assert result["decision"] == "ask"
+    assert "options" in result
 
 
 def test_llm_use_decision():
@@ -26,8 +40,8 @@ def test_llm_use_decision():
         '{"decision":"use","document_ids":["doc_1"],"reason":"Strong match"}'
     )
     result = decide_prior_context(
-        [{"id": "doc_1", "score": 0.9, "snippet": "invoice"}],
-        document_text="invoice text",
+        [{"id": "doc_1", "score": 0.9, "snippet": "weld crack"}],
+        document_text="weld crack report",
         llm=llm,  # type: ignore[arg-type]
         min_score=0.75,
     )
@@ -36,10 +50,26 @@ def test_llm_use_decision():
     assert llm.calls == 1
 
 
+def test_llm_skip_mapped_to_ask():
+    llm = FakeLLM(
+        '{"decision":"skip","document_ids":[],"reason":"Not related"}'
+    )
+    result = decide_prior_context(
+        [{"id": "doc_1", "score": 0.8, "snippet": "maybe"}],
+        document_text="report",
+        llm=llm,  # type: ignore[arg-type]
+        min_score=0.75,
+    )
+    assert result["decision"] == "ask"
+    assert result["options"] == list(ASK_OPTIONS)
+
+
 def test_examples_file_exists():
     path = (
         Path(__file__).resolve().parents[2]
         / "agentic_ai"
+        / "agents"
+        / "defect_analyzer"
         / "skills"
         / "decide_prior_context"
         / "examples.jsonl"

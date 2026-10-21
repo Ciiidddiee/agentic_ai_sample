@@ -1,0 +1,16 @@
+name: defect_analyzer
+goal: >
+  Given an uploaded defect report (PDF or Excel), extract its content, find
+  useful prior defect cases, decide use vs ask, and produce a defect analysis
+  when appropriate (summary, findings, severity, citations).
+
+done_when:
+  - Text is available for the upload (OCR or sheet extract)
+  - A prior-context decision was made (use, or ask resolved by the user)
+  - An analysis and/or ingest/drop outcome was produced as chosen
+    (ingest only via human ask→ingest or dedicated ingest API)
+
+stop_when:
+  - User chooses drop
+  - Unrecoverable extract failure without fallback text
+  - Decision is ask and no user_action yet

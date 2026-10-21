@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from agentic_ai.api.routes import register_routes
-from agentic_ai.logging_setup import setup_logging
-from agentic_ai.paths import ensure_data_dirs
+from agentic_ai.shared.logging_setup import setup_logging
+from agentic_ai.shared.paths import ensure_data_dirs
 
 load_dotenv()
 setup_logging()

@@ -1,0 +1,3 @@
+{"input": {"hits": []}, "output": {"decision": "ask", "document_ids": [], "options": ["continue", "ingest", "drop", "use"], "reason": "No candidates"}}
+{"input": {"hits": [{"id": "defect_1", "score": 0.92, "snippet": "cracked weld on bracket"}], "document_text": "weld crack report"}, "output": {"decision": "use", "document_ids": ["defect_1"], "reason": "Strong match on weld crack"}}
+{"input": {"hits": [{"id": "defect_2", "score": 0.2, "snippet": "unrelated"}], "document_text": "other"}, "output": {"decision": "ask", "options": ["continue", "ingest", "drop", "use"], "reason": "Score well below threshold"}}

@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from agentic_ai.environment.stores.config import StoreConfig
-from agentic_ai.environment.stores.knowledge_base import KnowledgeBaseStore
-from agentic_ai.tools.ingest import ingest
-from agentic_ai.tools.search import search
+from agentic_ai.agents.defect_analyzer.skills.ingest.run import ingest_defect
+from agentic_ai.agents.defect_analyzer.skills.search.run import search_prior_defects
+from agentic_ai.shared.environment.stores.config import StoreConfig
+from agentic_ai.shared.environment.stores.knowledge_base import KnowledgeBaseStore
 
 SAMPLES = Path(__file__).resolve().parents[2] / "data" / "raw" / "samples"
 
@@ -17,36 +17,24 @@ def isolated_kb(tmp_path, monkeypatch):
     (data_root / "processed").mkdir(parents=True)
     monkeypatch.setenv("DATA_DIR", str(data_root))
 
-    config = StoreConfig(
+    return StoreConfig(
         name="knowledge_base",
         path=kb_path,
         collection="documents",
         embedding_model="chroma-default",
     )
-    return config
 
 
 def test_ingest_and_search_ranks_invoice_above_contract(isolated_kb, monkeypatch):
     store = KnowledgeBaseStore(isolated_kb)
 
-    def _kb(config=None):
-        return KnowledgeBaseStore(isolated_kb)
-
     monkeypatch.setattr(
-        "agentic_ai.tools.ingest.pipeline.KnowledgeBaseStore",
+        "agentic_ai.agents.defect_analyzer.skills.ingest.run.KnowledgeBaseStore",
         lambda config=None: store,
     )
     monkeypatch.setattr(
-        "agentic_ai.tools.search.tool.KnowledgeBaseStore",
+        "agentic_ai.agents.defect_analyzer.skills.search.run.KnowledgeBaseStore",
         lambda config=None: store,
-    )
-    monkeypatch.setattr(
-        "agentic_ai.tools.search.tool.load_store_config",
-        lambda name=None: isolated_kb,
-    )
-    monkeypatch.setattr(
-        "agentic_ai.tools.ingest.pipeline.load_store_config",
-        lambda name=None: isolated_kb,
     )
 
     for name in (
@@ -56,9 +44,13 @@ def test_ingest_and_search_ranks_invoice_above_contract(isolated_kb, monkeypatch
     ):
         pdf = SAMPLES / name
         assert pdf.is_file()
-        ingest(pdf, document_id=f"sample_{pdf.stem}")
+        ingest_defect(pdf, document_id=f"sample_{pdf.stem}", store=store)
 
-    hits = search("Acme Corp SaaS invoice Total Due payment terms Net 30", top_k=3)
+    hits = search_prior_defects(
+        "Acme Corp SaaS invoice Total Due payment terms Net 30",
+        top_k=3,
+        store=store,
+    )
     assert hits
     assert "invoice" in hits[0]["id"]
     assert "contract" not in hits[0]["id"]
